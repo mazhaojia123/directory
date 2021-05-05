@@ -59,7 +59,7 @@ private:
 
     void preSave(CatalogNode *cur);
 
-    void preLoad(CatalogNode *cur);
+    void preLoad(CatalogNode *&cur);
 
     void updatePar(CatalogNode *);
 

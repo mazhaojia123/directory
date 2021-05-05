@@ -14,8 +14,8 @@ CatalogTree::~CatalogTree() {
     erase(cur); // 删掉整个的二叉结构
 }
 
-vector<CatalogNode*> CatalogTree::getChildren() {
-    vector<CatalogNode*> res;
+vector<CatalogNode *> CatalogTree::getChildren() {
+    vector<CatalogNode *> res;
     CatalogNode *cur = currentNode->child;
 
     if (cur == nullptr) return res;
@@ -31,12 +31,16 @@ vector<CatalogNode*> CatalogTree::getChildren() {
 void CatalogTree::eraseChild(const string &theRPath) {
     // 先将这个节点的孩子节点所在的二叉树全都删掉
     CatalogNode *pre = currentNode->child;
+
+    // 如果没有孩子，他却要删？？？那咱就直接返回，反正没得删
+    if (pre == nullptr) return;
+
     CatalogNode *cur = pre->sibling;
     while (cur != nullptr && cur->rPath != theRPath) {
         cur = cur->sibling;
         pre = pre->sibling;
     }
-    if (cur->rPath != theRPath)
+    if (cur == nullptr)
         return; // 没有找到这个节点
 
     erase(cur->child);
@@ -119,13 +123,18 @@ bool CatalogTree::save(const string &filePath) {
     output.open(filePath);
     if (!output.is_open()) return false;
 
+    vector<string> fullPath = getFPath(); // 先记下所在的路径
+
     preSave(root.child); // root的child为根的二叉树，打印到
+
+    for (int i = 1; i < fullPath.size(); i++)
+        output << fullPath[i] << ' ';
 
     output.close();
     return true;
 }
 
-void CatalogTree::preLoad(CatalogNode *cur) {
+void CatalogTree::preLoad(CatalogNode *&cur) {
     string tmp;
     input >> tmp;
 
@@ -141,7 +150,7 @@ void CatalogTree::preLoad(CatalogNode *cur) {
 void CatalogTree::updatePar(CatalogNode *cur) {
     if (cur != nullptr) {
         currentNode = cur;
-        vector<CatalogNode*> tmp = getChildren();
+        vector<CatalogNode *> tmp = getChildren();
         for (auto &item : tmp)
             item->parent = cur;
         updatePar(cur->child);
@@ -160,13 +169,18 @@ bool CatalogTree::load(const string &filePath) {
     // 不断new出其他的节点
     preLoad(root.child);
 
-    input.close();
 
     // 更新全体的父亲节点
-    updatePar(root.child);
+    updatePar(&root);
 
-    // 更新currentNode
+    // 恢复currentNode
     currentNode = &root;
+    string tmp;
+    while (input >> tmp) {
+        setPath(tmp);
+    }
+
+    input.close();
     return true;
 }
 
