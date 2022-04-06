@@ -72,7 +72,7 @@ void CatalogTree::setPath(const string &thePath) {
         CatalogNode *newCurrentNode = &root;
         vector<string> tmpPath = split(thePath);
 
-        for (auto &x : tmpPath) {
+        for (auto &x: tmpPath) {
             cur = newCurrentNode->child;
             while (cur != nullptr && cur->rPath != x)
                 cur = cur->sibling;
@@ -127,8 +127,8 @@ bool CatalogTree::save(const string &filePath) {
 
     preSave(root.child); // root的child为根的二叉树，打印到
 
-    for (int i = 1; i < fullPath.size(); i++)
-        output << fullPath[i] << ' ';
+//    for (int i = 1; i < fullPath.size(); i++)
+//        output << fullPath[i] << ' ';
 
     output.close();
     return true;
@@ -137,8 +137,9 @@ bool CatalogTree::save(const string &filePath) {
 void CatalogTree::preLoad(CatalogNode *&cur) {
     string tmp;
     input >> tmp;
+    cout << "read : " << tmp << endl;
 
-    if (tmp == "-1" || tmp.empty()) return; // 意味着读取失败
+    if (tmp == "-1") return; // 意味着读取失败
 
     cur = new CatalogNode;
     cur->rPath = tmp;
@@ -151,7 +152,7 @@ void CatalogTree::updatePar(CatalogNode *cur) {
     if (cur != nullptr) {
         currentNode = cur;
         vector<CatalogNode *> tmp = getChildren();
-        for (auto &item : tmp)
+        for (auto &item: tmp)
             item->parent = cur;
         updatePar(cur->child);
         updatePar(cur->sibling);
@@ -173,12 +174,12 @@ bool CatalogTree::load(const string &filePath) {
     // 更新全体的父亲节点
     updatePar(&root);
 
-    // 恢复currentNode
-    currentNode = &root;
-    string tmp;
-    while (input >> tmp) {
-        setPath(tmp);
-    }
+//    // 恢复currentNode
+//    currentNode = &root;
+//    string tmp;
+//    while (input >> tmp) {
+//        setPath(tmp);
+//    }
 
     input.close();
     return true;
@@ -235,5 +236,27 @@ vector<string> CatalogTree::split(const string &s) {
     }
     res.push_back(tmp);
     return res;
+}
+
+void CatalogTree::draw() {
+    printBT("", &root, false);
+}
+
+void CatalogTree::printBT(const string &prefix, const CatalogNode *node, bool isLeft) {
+    if (node != nullptr) {
+        std::cout << prefix;
+
+        std::cout << (isLeft ? "├── " : "");
+
+        // print the value of the node
+        if (node == &root)
+            std::cout << "/" << std::endl;
+        else
+            std::cout << node->rPath << std::endl;
+
+        // enter the next tree level - left and right branch
+        printBT(prefix + (isLeft ? "│   " : "│   "), node->child, true);
+        printBT(prefix + (isLeft ? "│   " : ""), node->sibling, false);
+    }
 }
 

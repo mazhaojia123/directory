@@ -34,6 +34,8 @@ void Shell::loop() {
                 t.setPathWithParent();
             else
                 t.setPath(args[1]);
+        } else if (args[0] == "p") {
+            t.draw();
         } else if (args[0] == "mkdir") {
             t.insertChild(args[1]);
         } else if (args[0] == "mkfile") {
