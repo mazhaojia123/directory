@@ -50,7 +50,11 @@ public:
 
     bool load(const string &filePath); // 看成二叉树
 
+    void draw();
+
 private:
+    void printBT(const std::string& prefix, const CatalogNode* node, bool isLeft);
+
     void erase(CatalogNode *cur); // 将当前的目录所在的子树释放掉
 
     static vector<string> split(const string &s);
